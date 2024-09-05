@@ -13,11 +13,14 @@ public class TreasureController : MonoBehaviour
     public int points;
     public bool big;
     public bool canCatch;
+    public Vector3 initialPos;
+    public bool mainObjetive;
 
     void Start(){
         hook = FindObjectOfType<HookController>();
         rb2d = GetComponent<Rigidbody2D>();
         canCatch = true;
+        initialPos = transform.position;
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -65,7 +68,7 @@ public class TreasureController : MonoBehaviour
 
     void Catch(){
         Destroy(gameObject);
-        GameController.Instance.AddMoney(points);
+        GameController.Instance.AddMoney(points, mainObjetive);
     }
 
     IEnumerator Cooldown(){

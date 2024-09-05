@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public Transform SpawnPoint;
-    private SpriteRenderer spriteRenderer;
+    public SpriteRenderer spriteRenderer;
     public GameObject Cockpit;
     private Rigidbody2D rb2d;
     public WaterLevelController water;
@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
     public float bumbForce = 0f;
     public float waterIncrease = 0f;
     public bool canMove = false;
-    private bool canBump = true; //
     public bool onAir = false;
     private bool drowned = false;
 
@@ -46,8 +45,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+       
         position.y += velocity.y * Time.fixedDeltaTime - gravity;
         position.x += velocity.x * Time.fixedDeltaTime;
+        Debug.Log(rb2d.velocity);
 
         rb2d.MovePosition(position);
     }
@@ -70,9 +71,8 @@ public class PlayerController : MonoBehaviour
 
     private void Bump()
     {
-        if (canBump && !drowned)
+        if (!drowned)
         {
-            canBump = false; // Prevent further calls
             water.level += waterIncrease;
             DropTreasure();
             StopCoroutine(DisableMovement(0));
@@ -82,15 +82,7 @@ public class PlayerController : MonoBehaviour
             {
                 velocity.y = Mathf.Max(velocity.y, 5);
             }
-
-            StartCoroutine(BumpCooldown()); // Start cooldown coroutine
         }
-    }
-
-    private IEnumerator BumpCooldown()
-    {
-        yield return new WaitForSeconds(0.01f); // Wait for 0.01 seconds
-        canBump = true; // Re-enable the function call
     }
 
     private void OnCollisionEnter2D(Collision2D col)
@@ -147,6 +139,7 @@ public class PlayerController : MonoBehaviour
         position = transform.position;
         water.level = 0;
         Cockpit.transform.SetParent(transform);
+        Cockpit.transform.rotation = Quaternion.Euler(0, 0, 0);
         Cockpit.transform.localPosition = new(0,0.5f,0);
         drowned = false;
         canMove = true;
@@ -154,7 +147,7 @@ public class PlayerController : MonoBehaviour
     }
     
     public IEnumerator Dragged(GameObject obj, float time, int from, int to){
-        Debug.Log(obj);
+        DropTreasure();
         StartCoroutine(DisableMovement(time));
         Quaternion initialRotation = Quaternion.Euler(0, 0, from);
         Quaternion targetRotation = Quaternion.Euler(0, 0, to); // Rotate 360 degrees

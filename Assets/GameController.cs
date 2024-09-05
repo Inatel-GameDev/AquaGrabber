@@ -47,19 +47,16 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene("MainMenuScene");
     }
 
-    public void AddMoney(int point){
+    public void AddMoney(int point, bool end){
         points += point;
         UI.AddMoney(points);
-        StartCoroutine(CheckForCompletion());
+        if(end)
+            StartCoroutine(CheckForCompletion());
     }
 
     public IEnumerator CheckForCompletion(){
         yield return new WaitForSeconds(.1f);
-        TreasureController[] t = FindObjectsOfType<TreasureController>();
-        Debug.Log(t.Length);
-        if(t.Length == 1){
-            UI.Victory();
-        }
+        UI.Victory();
     }
 
     public void ChangeLives(){
